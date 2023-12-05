@@ -10,8 +10,8 @@ function point(sp, t) {
     return {x:0.5*tx, y:0.5*ty};
 }
 
-function spline(p, l) {
-    var s = [], g = [], i = 0;
+function spline(p) {
+    var s = [], g = [], i = 0, l = p.length;
     for(i=0; i < l-3; i++) {
         s.push(sp(p[i],p[i+1],p[i+2],p[i+3])); }
         s.push(sp(p[l-3],p[l-2],p[l-1],p[0]));

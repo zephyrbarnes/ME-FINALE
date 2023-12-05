@@ -1,19 +1,68 @@
 const cos = Math.cos, sin = Math.sin, tan = Math.tan, sqrt = Math.sqrt, pi = Math.PI; // Math functions
-const f = false;
 
-const first = new path([{x:40, y:195},{x:60, y:200},{x:100,y:200},{x:140,y:200},{x:160,y:190},{x:170,y:180},{x:180,y:160},
-                        {x:190,y:120},{x:180,y: 90},{x:170,y: 70},{x:160,y: 60},{x:140,y: 60},{x:130,y: 80},{x:130,y:110},
-                        {x:120,y:130},{x:100,y:140},{x:70, y:130},{x:40, y:130},{x:20, y:150},{x:20, y:170},{x:30, y:190}],col,10);
+const first = [{x:40, y:195},{x:60, y:200},{x:100,y:200},{x:140,y:200},{x:160,y:190},{x:170,y:180},{x:180,y:160},
+               {x:190,y:120},{x:180,y: 90},{x:170,y: 70},{x:160,y: 60},{x:140,y: 60},{x:130,y: 80},{x:130,y:110},
+               {x:120,y:130},{x:100,y:140},{x:70, y:130},{x:40, y:130},{x:20, y:150},{x:20, y:170},{x:30, y:190}];
+
+const other = [{x: 81.8, y: 196.0},
+               {x: 108.0,y: 210.0},
+               {x: 152.0,y: 216.0},
+               {x: 182.0,y: 185.6},
+               {x: 190.0,y: 159.0},
+               {x: 198.0,y: 122.0},
+               {x: 226.0,y:  93.0},
+               {x: 224.0,y:  41.0},
+               {x: 204.0,y:  15.0},
+               {x: 158.0,y:  24.0},
+               {x: 146.0,y:  52.0},
+               {x: 157.0,y:  93.0},
+               {x: 124.0,y: 129.0},
+               {x: 83.0, y: 104.0},
+               {x: 77.0, y:  62.0},
+               {x: 40.0, y:  57.0},
+               {x: 21.0, y:  83.0},
+               {x: 33.0, y: 145.0},
+               {x: 30.0, y: 198.0},
+               {x: 48.0, y: 210.0}];
 var pv = function(v) { return Number((v).toFixed(4)); }
 var keyH = new controller(), key = keyH.keyState;
 
-var cur = first;
+var cur = new path(other, col, 70);
 var start = mid(cur.left[1], cur.rite[1]);
-const c = new car(start.x, start.y, 0.1,0.05);
+var c = new car(start.x, start.y, 0.1,0.05);
+
+var results,
+    model = {
+        "optimize": "time",
+        "opType": "min",
+        "constraints": {},
+        "variables": {
+            "car": {
+                "forward": {"binary": 1},  // Boolean variable for forward (W key)
+                "left": {"binary": 0},    // Boolean variable for left (A key)
+                "right": {"binary": 1}    // Boolean variable for right (D key)
+            }
+        },
+    },
+    priority = 0;
+
+for (let i = 0; i < cur.gon.length; i++) {
+    model.constraints["onTrack"] = { "min": 1, "max": checkOn(c, cur.gon[i]) ? 1 : 0 };
+    if(i == priority) {
+        model.constraints["minD" + i] = { "min": 0, "max": distance(c.cn[1], cur.gon[i][1], cur.gon[i][2]) };
+    } else {
+        model.constraints["minD" + i] = { "min": 0, "max": Infinity };
+    }
+    if(passedGon(c, cur.gon[i])) {
+        priority++;
+    }
+}
+
+console.log(results);
 
 function tick() { ct.clearRect(0, 0, cw, ch);
     c.update();
-    checkOn(c,cur.gon);
+    if(dBug == 2 || dBug == 3 || dBug == 4) { checkOn(c,cur.gon); }
     cur.drawPath();
     keysCheck();
     c.drawCar();

@@ -1,13 +1,12 @@
 class car {
     constructor(x, y) {
         Object.assign(this, {/*Speed*/s: 0.0001, /*Angle*/a: 0, /*Turn Angle*/t: 0.1,
-        p:{x: pv(x), y: pv(y)}, on: true, w:4, h:2.5, maxS:0.8, cn:[]});
+        p:{x: pv(x), y: pv(y)}, on: true, w:6, h:4, maxS:0.8, cn:[]});
     }
 
     drawCar() {
         ct.fillStyle = "red";
         ct.beginPath();
-        this.calculateCorners();
         ct.moveTo((this.cn[0].x*scale) + xOff, (this.cn[0].y*scale) + yOff);
         for (const corner of this.cn) {
             ct.lineTo((corner.x*scale) + xOff, (corner.y*scale) + yOff);
@@ -28,15 +27,19 @@ class car {
         }else{ this.s = 0.0001}
     }
 
+    reset(x, y) {
+        this.p.x = x; this.p.y = y; this.s = 0.0001; this.a = 0; this.on = true;
+    }
+
     calculateCorners() {
         const cA = cos(this.a), sA = sin(this.a);
         const hW = this.w / 2;
         const hH = this.h / 2;
 
         this.cn = [{x: pv(this.p.x - hW * cA + hH * sA), y: pv(this.p.y - hW * sA - hH * cA)},
-                        {x: pv(this.p.x + hW * cA + hH * sA), y: pv(this.p.y + hW * sA - hH * cA)},
-                        {x: pv(this.p.x + hW * cA - hH * sA), y: pv(this.p.y + hW * sA + hH * cA)},
-                        {x: pv(this.p.x - hW * cA - hH * sA), y: pv(this.p.y - hW * sA + hH * cA)}];
+                   {x: pv(this.p.x + hW * cA + hH * sA), y: pv(this.p.y + hW * sA - hH * cA)},
+                   {x: pv(this.p.x + hW * cA - hH * sA), y: pv(this.p.y + hW * sA + hH * cA)},
+                   {x: pv(this.p.x - hW * cA - hH * sA), y: pv(this.p.y - hW * sA + hH * cA)}];
     }
 
     toString() {
