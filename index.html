@@ -9,9 +9,16 @@
 	<div>
 		<canvas id="cv"></canvas>
 	</div>
-    <script src="https://unpkg.com/solverjs@1.1.4/dist/solver.js"></script>
+    <script>
+        const cv = document.getElementById('cv'), ct = cv.getContext('2d'),
+        cw = cv.width = window.innerWidth, ch = cv.height = window.innerHeight,
+        cb = window.getComputedStyle(cv).backgroundColor;
+    </script>
+    <script src="https://unpkg.com/javascript-lp-solver/prod/solver.js"></script>
+    <script src="vehicle.js"></script>
     <script src="inputs.js"></script>
 	<script src="spline.js"></script>
+    <script src="tracks.js"></script>
     <script src="script.js"></script>
 
 </body>
