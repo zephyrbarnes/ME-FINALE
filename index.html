@@ -6,19 +6,37 @@
 </head>
 
 <body>
-	<div>
+	<div id="canv">
 		<canvas id="cv"></canvas>
 	</div>
+    <div id="info">
+        <h1 style="margin-left:15%;">Spline Math</h1>
+        <p>
+            <span class="red1">t1 = t*t</span>
+            <span class="red2">t2 = t1*t</span>
+            <span class="orng1">q1 = -t2 + 2*t1 - t</span>
+            <span class="orng2">q2 = 3*t2 - 5*t1 + 2</span>
+            <span class="orng3">q3 = -3*t2 + 4*t1 + t</span>
+            <span class="orng4">q4 = t2 - t1</span>
+        </p>
+        <p>
+            <span class="ylw1">tx = (x0*q1 + x1*q2 + x2*q3 + x3*q4) / 2</span>
+            <span class="ylw2">ty = (y0*q1 + y1*q2 + y2*q3 + y3*q4) / 2</span>
+        </p>
+
+
+    </div>
     <script>
-        const cv = document.getElementById('cv'), ct = cv.getContext('2d'),
-              cw = cv.width = window.innerWidth, ch = cv.height = window.innerHeight,
-              cb = window.getComputedStyle(cv).backgroundColor, f = false;
-        var dBug = 0, dMax = 5, iter = 1, spacePressed = false;
+        const   cv = document.getElementById('cv'), ct = cv.getContext('2d'),
+                cb = window.getComputedStyle(cv).backgroundColor, f = false,
+                ch = cv.height = window.innerHeight,
+                cw = cv.width = window.innerWidth;
+        var dBug = 0, dMax = 4, iter = 1, spacePressed = false, scale = 3;
     </script>
+    <script src="vehicle.js"></script>
     <script src="solver.js"></script>
     <script src="tracks.js"></script>
 	<script src="spline.js"></script>
-    <script src="vehicle.js"></script>
     <script src="inputs.js"></script>
     <script src="script.js"></script>
 

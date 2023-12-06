@@ -4,10 +4,19 @@ body {
     margin: 0;
 }
 
-div {
-    width: 70%;
-    margin-left: 15%;
+#canv {
+    width: 50%;
     position: absolute;
+}
+
+#info {
+    top: 0;
+    transform: translate(52%, 0);
+    color: #fff;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 1.1rem;
+
+
 }
 
 canvas {
@@ -18,3 +27,12 @@ canvas {
     image-rendering: pixelated;
     display: block;
 }
+
+.red1 { color: #F08080; margin-right: 1%; }
+.red2 { color: rgb(255, 158, 147); margin-right: 3%; }
+.orng1 { color: rgb(255, 149, 57); margin-right: 1%;}
+.orng2 { color: rgb(255, 173, 101); margin-right: 1%; }
+.orng3 { color: rgb(255, 194, 110); margin-right: 1%; }
+.orng4 { color: rgb(255, 214, 156); }
+.ylw1 { color: rgb(255, 233, 67); margin-right: 2%; }
+.ylw2 { color: rgb(245, 235, 162); }

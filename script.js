@@ -1,90 +1,121 @@
-const cos = Math.cos, sin = Math.sin, tan = Math.tan, sqrt = Math.sqrt, pi = Math.PI; // Math functions
+const cos = Math.cos,
+  sin = Math.sin,
+  tan = Math.tan,
+  sqrt = Math.sqrt,
+  pi = Math.PI; // Math functions
 
-const first = [{x:40, y:195},{x:60, y:200},{x:100,y:200},{x:140,y:200},{x:160,y:190},{x:170,y:180},{x:180,y:160},
-               {x:190,y:120},{x:180,y: 90},{x:170,y: 70},{x:160,y: 60},{x:140,y: 60},{x:130,y: 80},{x:130,y:110},
-               {x:120,y:130},{x:100,y:140},{x:70, y:130},{x:40, y:130},{x:20, y:150},{x:20, y:170},{x:30, y:190}];
+const track1 = [
+  { x: 81, y: 196 },
+  { x: 108, y: 210 },
+  { x: 152, y: 216 },
+  { x: 182, y: 185 },
+  { x: 190, y: 159 },
+  { x: 198, y: 122 },
+  { x: 226, y: 93 },
+  { x: 224, y: 41 },
+  { x: 204, y: 15 },
+  { x: 158, y: 24 },
+  { x: 146, y: 52 },
+  { x: 157, y: 93 },
+  { x: 124, y: 129 },
+  { x: 83, y: 104 },
+  { x: 77, y: 62 },
+  { x: 40, y: 57 },
+  { x: 21, y: 83 },
+  { x: 33, y: 145 },
+  { x: 30, y: 198 },
+  { x: 48, y: 210 },
+];
 
-const other = [{x: 81.8, y: 196.0},
-               {x: 108.0,y: 210.0},
-               {x: 152.0,y: 216.0},
-               {x: 182.0,y: 185.6},
-               {x: 190.0,y: 159.0},
-               {x: 198.0,y: 122.0},
-               {x: 226.0,y:  93.0},
-               {x: 224.0,y:  41.0},
-               {x: 204.0,y:  15.0},
-               {x: 158.0,y:  24.0},
-               {x: 146.0,y:  52.0},
-               {x: 157.0,y:  93.0},
-               {x: 124.0,y: 129.0},
-               {x: 83.0, y: 104.0},
-               {x: 77.0, y:  62.0},
-               {x: 40.0, y:  57.0},
-               {x: 21.0, y:  83.0},
-               {x: 33.0, y: 145.0},
-               {x: 30.0, y: 198.0},
-               {x: 48.0, y: 210.0}];
-var pv = function(v) { return Number((v).toFixed(4)); }
-var keyH = new controller(), key = keyH.keyState;
+const track2 = [
+  { x: 40, y: 195 },
+  { x: 60, y: 200 },
+  { x: 100, y: 200 },
+  { x: 140, y: 200 },
+  { x: 160, y: 190 },
+  { x: 170, y: 180 },
+  { x: 180, y: 160 },
+  { x: 190, y: 120 },
+  { x: 180, y: 90 },
+  { x: 170, y: 70 },
+  { x: 160, y: 60 },
+  { x: 140, y: 60 },
+  { x: 130, y: 80 },
+  { x: 130, y: 110 },
+  { x: 120, y: 130 },
+  { x: 100, y: 140 },
+  { x: 70, y: 130 },
+  { x: 40, y: 130 },
+  { x: 20, y: 150 },
+  { x: 20, y: 170 },
+  { x: 30, y: 190 },
+];
+var pv = function (v) {
+  return Number(v.toFixed(4));
+};
+var keyH = new controller(),
+  key = keyH.keyState;
 
-var cur = new path(other, col, 70);
+var cur = new path(track1, col, 70);
 var start = mid(cur.left[1], cur.rite[1]);
-var c = new car(start.x, start.y, 0.1,0.05);
+var c = new car(start.x, start.y);
 
-var solver = new Solver(),
-    results,
-    model = {
-        "optimize": "time",
-        "opType": "min",
-        "constraints": {},
-        "variables": {
-            "car": {
-                "forw": {"binary": 0},  // Boolean variable for forward (W key)
-                "left": {"binary": 0},    // Boolean variable for left (A key)
-                "rite": {"binary": 0},    // Boolean variable for right (D key)
-                "time": { "int": 1 }  // Integer variable for arrival time
-            }
-        },
-    },
-    priority = 0;
+// var solver = new Solver(),
+//     results,
+//     model = {
+//         "optimize": "dist",
+//         "opType": "min",
+//         "constraints": {
+//             "sped": { "min": 0, "max": 0.8 },
+//             "angl": { "min": -100000, "max": 100000 },
+//             "turn": { "min": 0.1 - (0.8 / 0.8) * 0.08, "max": 0.1 },
+//             "carx": { "min": 0, "max": 1000 },
+//             "cary": { "min": 0, "max": 1000 }
+//         },
+//         "variables": {
+//             "car": {
+//                 "forw": {"binary": 0, "dist": -1}, // negative weight because we want to minimize dist
+//                 "left": {"binary": 0, "dist": -1}, // negative weight because we want to minimize dist
+//                 "rite": {"binary": 0, "dist": -1}, // negative weight because we want to minimize dist
+//                 "dist": {"min": 0, "max": 10000}
+//             }
+//         },
+//     };
 
-for (let i = 0; i < cur.gon.length; i++) {
-    var curgon = cur.gon[i], onGon = checkOn(c, curgon);
-    model.constraints["onTrack"] = { "min": 0, "max": onGon ? 1 : 0 };
-    if(i == priority) {
-        model.constraints["minD" + i] = { "min": 0, "max": distance(c.cn[1], curgon[1], curgon[2]) };
-    } else {
-        model.constraints["minD" + i] = { "min": 0, "max": Infinity };
-    }
-    if(onGon && !c.enterTime) {
-        c.enterTime = Date.now();
-    }else{
-        c.timeDiff = (Date.now() - c.enterTime) / 1000;
-        model.variables.car.time = c.timeDiff;
-        c.enterTime = null;
-        priority++;
-    }
-}
+// var forw = 0, left = 0, rite = 0;
 
-results = solver.Solve(model);
+// console.log(JSON.stringify(model, null, 2));
+// results = solver.Solve(model);
+// console.log(results);
 
-var resultsArray = [];
+// var sped = c.s + 0.028*forw - 0.02,
+//     turn = 0.1 - (sped / 0.8) * 0.08,
+//     angl = (c.a + turn*(rite - left)) * pi / 180,
+//     carx = c.p.x + sped * (1 - angl * angl / 2),
+//     cary = c.p.y + sped * angl,
+//     crnr = {x: carx + 3 * (1 - angl * angl / 2) + 2 * angl, y: cary + 3 * angl - 2 * (1 - angl * angl / 2)};
 
-function tick() { ct.clearRect(0, 0, cw, ch);
-    c.update();
-    if(dBug == 2 || dBug == 3 || dBug == 4 || dBug == 5) { checkOn(c,cur.gon); }
-    cur.drawPath();
+// var curGon = cur.gon[0];
+// for(var i  = 0; i < cur.gon.length; i++) {
+//     if(ins(c.p, cur.gon[i])) curGon = cur.gon[i];
+// }
+// var dist = distance(crnr,curGon[1], curGon[2]);
+// model.variables.car.dist = {"min": 0, "max": 10000};
 
-    c.timeDiff = (Date.now() - c.enterTime) / 1000;
-    model.variables.car.time = c.timeDiff;
+// results = solver.Solve(model);
+// console.log(results);
 
-    results = solver.Solve(model);
-    console.log(results);
-
-    resultsArray.push(results);
-
-    keysCheck(results);
-    c.drawCar();
+function tick() {
+  ct.clearRect(0, 0, cw, ch);
+  c.update();
+  if (dBug != 0 ) {
+    checkOn(c, cur.gon);
+  }
+  cur.drawPath();
+  keysCheck();
+  c.drawCar();
 }
 var id = setInterval(tick, 15);
-window.addEventListener('beforeunload', function(e) { clearInterval(id); });
+window.addEventListener("beforeunload", function (e) {
+  clearInterval(id);
+});
