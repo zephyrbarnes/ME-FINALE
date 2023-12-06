@@ -55,55 +55,57 @@ var pv = function (v) {
 };
 var keyH = new controller(),
   key = keyH.keyState;
+  
+  var cur = new path(track1, col, 70);
+  var start = mid(cur.left[1], cur.rite[1]);
+  var c = new car(start.x, start.y);
+  
 
-var cur = new path(track1, col, 70);
-var start = mid(cur.left[1], cur.rite[1]);
-var c = new car(start.x, start.y);
+var forw = 0, left = 0, rite = 0,
+    sped = c.s + 0.028*forw - 0.02,
+    turn = 0.1,
+    angl = 0,
+    carx = c.p.x,
+    cary = c.p.y,
+    solver = new Solver(),
+    results,
+    model = {
+        "optimize": "dist",
+        "opType": "min",
+        "constraints": {
+            "sped": { "min": 0, "max": 0.8 },
+            "angl": { "min": -10000, "max": 10000 },
+            "turn": { "min": 0.02, "max": 0.1 },
+            "carx": { "min": 0, "max": 1000 },
+            "cary": { "min": 0, "max": 1000 }
+        },
+        "variables": {
+            "car": {
+                forw: {"binary": 0}, // negative weight because we want to minimize dist
+                left: {"binary": 0}, // negative weight because we want to minimize dist
+                rite: {"binary": 0}, // negative weight because we want to minimize dist
+            }
+        },
+    };
 
-// var solver = new Solver(),
-//     results,
-//     model = {
-//         "optimize": "dist",
-//         "opType": "min",
-//         "constraints": {
-//             "sped": { "min": 0, "max": 0.8 },
-//             "angl": { "min": -100000, "max": 100000 },
-//             "turn": { "min": 0.1 - (0.8 / 0.8) * 0.08, "max": 0.1 },
-//             "carx": { "min": 0, "max": 1000 },
-//             "cary": { "min": 0, "max": 1000 }
-//         },
-//         "variables": {
-//             "car": {
-//                 "forw": {"binary": 0, "dist": -1}, // negative weight because we want to minimize dist
-//                 "left": {"binary": 0, "dist": -1}, // negative weight because we want to minimize dist
-//                 "rite": {"binary": 0, "dist": -1}, // negative weight because we want to minimize dist
-//                 "dist": {"min": 0, "max": 10000}
-//             }
-//         },
-//     };
+function shortest(point, lineStart, lineEnd) {
+  var dx = lineEnd.x - lineStart.x,
+      dy = lineEnd.y - lineStart.y;
 
-// var forw = 0, left = 0, rite = 0;
+  const t = ((point.x - lineStart.x) * dx + (point.y - lineStart.y) * dy) / (dx * dx + dy * dy);
 
-// console.log(JSON.stringify(model, null, 2));
-// results = solver.Solve(model);
-// console.log(results);
-
-// var sped = c.s + 0.028*forw - 0.02,
-//     turn = 0.1 - (sped / 0.8) * 0.08,
-//     angl = (c.a + turn*(rite - left)) * pi / 180,
-//     carx = c.p.x + sped * (1 - angl * angl / 2),
-//     cary = c.p.y + sped * angl,
-//     crnr = {x: carx + 3 * (1 - angl * angl / 2) + 2 * angl, y: cary + 3 * angl - 2 * (1 - angl * angl / 2)};
-
-// var curGon = cur.gon[0];
-// for(var i  = 0; i < cur.gon.length; i++) {
-//     if(ins(c.p, cur.gon[i])) curGon = cur.gon[i];
-// }
-// var dist = distance(crnr,curGon[1], curGon[2]);
-// model.variables.car.dist = {"min": 0, "max": 10000};
-
-// results = solver.Solve(model);
-// console.log(results);
+  let closestPoint;
+  if (t < 0) {
+      closestPoint = lineStart;
+  } else if (t > 1) {
+      closestPoint = lineEnd;
+  } else {
+      closestPoint = { x: lineStart.x + t * dx, y: lineStart.y + t * dy };
+  }
+  dx = point.x - closestPoint.x;
+  dy = point.y - closestPoint.y;
+  return (dx * dx + dy * dy);
+}
 
 function tick() {
   ct.clearRect(0, 0, cw, ch);
@@ -111,8 +113,26 @@ function tick() {
   if (dBug != 0 ) {
     checkOn(c, cur.gon);
   }
+
+  sped = sped + 0.028*forw - 0.02,
+  turn = 0.1 - (sped / 0.8) * 0.08,
+  angl = (angl + turn*(rite - left)) * pi / 180,
+  carx = carx + sped * (1 - angl * angl / 2),
+  cary = cary + sped * angl,
+  crnr = {x: carx + 3 * (1 - angl * angl / 2) + 2 * angl, y: cary + 3 * angl - 2 * (1 - angl * angl / 2)};
+
+  var curGon = cur.gon[0];
+  for(var i  = 0; i < cur.gon.length; i++) {
+      if(ins(crnr, cur.gon[i])) curGon = cur.gon[i];
+  }
+  var dist = shortest(crnr,curGon[1], curGon[2]);
+  model.variables.car.dist = {"min": 0, "max": 100000};
+
+  results = solver.Solve(model);
+  console.log(results);
+
   cur.drawPath();
-  keysCheck();
+  keysCheck(results);
   c.drawCar();
 }
 var id = setInterval(tick, 15);

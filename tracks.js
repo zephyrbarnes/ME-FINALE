@@ -95,7 +95,7 @@ class path {
               ct.lineTo(gons[0].x * scale + xOff, gons[0].y * scale + yOff);
               ct.stroke();
             });
-          } else if (dBug == 4) {
+          } else if (dBug == 4 || dBug == 5) {
             ct.lineWidth = 3;
             this.gon.forEach((gons) => {
               ct.beginPath();

@@ -28,6 +28,14 @@ let counter = 0;
 const TICKS_PER_CHANGE = 10;
 
 function keysCheck(results) {
+  if (dBug == 5) {
+    if (results.forw) c.s = pv(c.s + 0.008); else c.s = pv(c.s - 0.02);
+
+    if (results.left) c.a = pv(c.a - c.t);
+    if (results.rite) c.a = pv(c.a + c.t);
+  }
+
+
   if (key[87]) c.s = pv(c.s + 0.008);
   else if (!key[87]) c.s = pv(c.s - 0.02);
 
@@ -36,30 +44,30 @@ function keysCheck(results) {
   if (key[83]) c.s = pv(c.s - 0.5);
 
     counter++;
-    if (counter >= TICKS_PER_CHANGE) {
-        counter = 0; // reset counter
-        if (key[38]) {
-            if(iter < 100) iter++;
-            if (dBug == 0) {
-                cur = new path(track1, col, 70);
-            } else if (dBug == 1) {
-                cur = new path(track1, col, 12);
-            } else if (dBug == 2 || dBug == 3 || dBug == 4) {
-                if(iter > 10) iter = 10;
-                cur = new path(track2, col, 10);
-            }
-        }
-        if (key[40]) {
-            if(iter > 1) iter--;
-            if (dBug == 0) {
+  if (counter >= TICKS_PER_CHANGE) {
+      counter = 0; // reset counter
+      if (key[38]) {
+        if(iter < 100) iter++;
+        if (dBug == 0) {
             cur = new path(track1, col, 70);
-            } else if (dBug == 1) {
+        } else if (dBug == 1) {
             cur = new path(track1, col, 12);
-            } else if (dBug == 2 || dBug == 3 || dBug == 4) {
+        } else if (dBug == 2 || dBug == 3 || dBug == 4) {
+            if(iter > 10) iter = 10;
             cur = new path(track2, col, 10);
-            }
-        }
-    }
+        } else iter = 1; cur = new path(track2, col, 10);
+      }
+  }
+  if (key[40]) {
+      if(iter > 1) iter--;
+      if (dBug == 0) {
+      cur = new path(track1, col, 70);
+      } else if (dBug == 1) {
+      cur = new path(track1, col, 12);
+      } else if (dBug == 2 || dBug == 3 || dBug == 4) {
+      cur = new path(track2, col, 10);
+      } else iter = 1; cur = new path(track2, col, 10);
+  }
   if (key[32]) {
     if (!spacePressed) {
       dBug++;
@@ -69,7 +77,7 @@ function keysCheck(results) {
         cur = new path(track1, col, 70);
       } else if (dBug == 1) {
         cur = new path(track1, col, 12);
-      } else if (dBug == 2) {
+      } else if (dBug != 0 || dBug != 1) {
         cur = new path(track2, col, 10);
       }
       if (dBug == 0 || dBug == 1) start = cur.spt[0];
