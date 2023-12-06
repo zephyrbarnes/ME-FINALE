@@ -31,40 +31,59 @@ var cur = new path(other, col, 70);
 var start = mid(cur.left[1], cur.rite[1]);
 var c = new car(start.x, start.y, 0.1,0.05);
 
-var results,
+var solver = new Solver(),
+    results,
     model = {
         "optimize": "time",
         "opType": "min",
         "constraints": {},
         "variables": {
             "car": {
-                "forward": {"binary": 1},  // Boolean variable for forward (W key)
+                "forw": {"binary": 0},  // Boolean variable for forward (W key)
                 "left": {"binary": 0},    // Boolean variable for left (A key)
-                "right": {"binary": 1}    // Boolean variable for right (D key)
+                "rite": {"binary": 0},    // Boolean variable for right (D key)
+                "time": { "int": 1 }  // Integer variable for arrival time
             }
         },
     },
     priority = 0;
 
 for (let i = 0; i < cur.gon.length; i++) {
-    model.constraints["onTrack"] = { "min": 1, "max": checkOn(c, cur.gon[i]) ? 1 : 0 };
+    var curgon = cur.gon[i], onGon = checkOn(c, curgon);
+    model.constraints["onTrack"] = { "min": 0, "max": onGon ? 1 : 0 };
     if(i == priority) {
-        model.constraints["minD" + i] = { "min": 0, "max": distance(c.cn[1], cur.gon[i][1], cur.gon[i][2]) };
+        model.constraints["minD" + i] = { "min": 0, "max": distance(c.cn[1], curgon[1], curgon[2]) };
     } else {
         model.constraints["minD" + i] = { "min": 0, "max": Infinity };
     }
-    if(passedGon(c, cur.gon[i])) {
+    if(onGon && !c.enterTime) {
+        c.enterTime = Date.now();
+    }else{
+        c.timeDiff = (Date.now() - c.enterTime) / 1000;
+        model.variables.car.time = c.timeDiff;
+        c.enterTime = null;
         priority++;
     }
 }
 
-console.log(results);
+results = solver.Solve(model);
+
+var resultsArray = [];
 
 function tick() { ct.clearRect(0, 0, cw, ch);
     c.update();
-    if(dBug == 2 || dBug == 3 || dBug == 4) { checkOn(c,cur.gon); }
+    if(dBug == 2 || dBug == 3 || dBug == 4 || dBug == 5) { checkOn(c,cur.gon); }
     cur.drawPath();
-    keysCheck();
+
+    c.timeDiff = (Date.now() - c.enterTime) / 1000;
+    model.variables.car.time = c.timeDiff;
+
+    results = solver.Solve(model);
+    console.log(results);
+
+    resultsArray.push(results);
+
+    keysCheck(results);
     c.drawCar();
 }
 var id = setInterval(tick, 15);

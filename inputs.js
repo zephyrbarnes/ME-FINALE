@@ -15,11 +15,11 @@ class controller {
     key(keyCode) { return this.keyState[keyCode]; }
 }
 
-function keysCheck() {
+function keysCheck(results) {
     if(dBug == 5) {
-        if(results.car.forward) { c.s = pv(c.s + 0.008); }else if(!results.car.forward){ c.s = pv(c.s - 0.02); }
-        if(results.car.left) { c.a = pv(c.a - c.t); }
-        if(results.car.right) { c.a = pv(c.a + c.t); }
+        if(results.forw) { c.s = pv(c.s + 0.008); }else if(!results.forw){ c.s = pv(c.s - 0.02); }
+        if(results.left) { c.a = pv(c.a - c.t); }
+        if(results.rite) { c.a = pv(c.a + c.t); }
     }else{
         if(key[87]) { c.s = pv(c.s + 0.008); }else if(!key[87]){ c.s = pv(c.s - 0.02); }
         if(key[65]) { c.a = pv(c.a - c.t); }

@@ -2,6 +2,9 @@ class car {
     constructor(x, y) {
         Object.assign(this, {/*Speed*/s: 0.0001, /*Angle*/a: 0, /*Turn Angle*/t: 0.1,
         p:{x: pv(x), y: pv(y)}, on: true, w:6, h:4, maxS:0.8, cn:[]});
+        this.enterTime;
+        this.timeDiff;
+        this.calculateCorners();
     }
 
     drawCar() {
